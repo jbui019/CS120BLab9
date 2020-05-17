@@ -46,12 +46,7 @@ void PWM_off(){
 	TCCR3A = 0x00;
 	TCCR3B = 0x00;
 }
-enum States{start, init, up, down, wait, toggle}state;
-double array[9] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 0};
-double temp = 0;
-unsigned char position = 0x00;
-unsigned char clicker = 0x00;
-unsigned char temp2 = 0x00;
+enum States{start, init, on, off}state;
 unsigned char buttons;
 unsigned char button1;
 unsigned char button2;
@@ -62,42 +57,26 @@ void tick(){
 			state = init;
 			break;
 		case init:
-			if(buttons == 0x01){
-				state = up;
-			}
-			else if(buttons == 0x02){
-				state = down;
-			}
-			else if(buttons == 0x04){
-				state = toggle;
+			if(buttons != 0x00){
+				state = on;
 			}
 			else{
 				state = init;
 			}
 			break;
 
-		case up:
-			temp = array[position];
-			state = wait;
-			break;
-
-		case down:
-			temp = array[position];
-			state = wait;
-			break;
-		case wait:
-			if(buttons == 0x00){
-				state = init;
+		case on:
+			if(buttons != 0x00){
+				state = on;
 			}
 			else{
-				state = wait;
+				state = off;
 			}
 			break;
 
-		case toggle:
-			state = wait;
+		case off:
+			state = init;
 			break;
-
 		default:
 			break;
 	}
@@ -106,41 +85,22 @@ void tick(){
 		case start:
 			break;
 		case init:
+			set_PWM(0);
 			break;
 
-		case up:
-			if((position + 1) > 0x07){
-				position = 0x07;
+		case on:
+			if(button1 == 0x01){
+				set_PWM(261.63);
 			}
-			else{
-				position++;
+			else if(button2 == 0x01){
+				set_PWM(293.66);
 			}
-			break;
-		case down:
-			if((position - 1) < 0x00){
-				position = 0x00;
-			}
-			else{
-				position--;
+			else if(button3 == 0x01){
+				set_PWM(329.63);
 			}
 			break;
-		case wait:
-			temp = array[position];
-			set_PWM(temp);
-			break;
-
-		case toggle:
-			if(clicker){
-				PWM_off();
-				temp2 = position;
-				position = 8;
-				clicker = 0;
-			}
-			else{
-				PWM_on();
-				position = temp2;
-				clicker = 1;
-			}
+		case off:
+			set_PWM(0);
 			break;
 
 		default:
@@ -155,7 +115,6 @@ int main(void) {
 	DDRB = 0xFF; PORTB = 0x00;
 	state = start;
 	PWM_on();
-	clicker = 1;
     /* Insert your solution below */
     while (1) {
 	buttons = (~PINA & 0x07);

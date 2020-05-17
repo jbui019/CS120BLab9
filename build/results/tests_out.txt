@@ -1,7 +1,8 @@
-Breakpoint 1 at 0x41a: file source/main.c, line 117.
+Breakpoint 1 at 0x698: file source/main.c, line 192.
 Note: automatically using hardware breakpoints for read-only addresses.
 ======================================================
 Running all tests..."
 
-"PINA: 0x00, PINB: 0x00 => PORTC: 0"...======================================================
-Remote doesn't know how to detach
+"PINA: 0x00, PINB: 0x00 => PORTC: 0"...Error detected on fd 6
+test/tests.gdb:35: Error in sourced command file:
+Remote communication error.  Target disconnected.: Interrupted system call.
